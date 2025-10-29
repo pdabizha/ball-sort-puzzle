@@ -36,7 +36,6 @@ export default function App() {
   const MAX_SPEED = 6;
   const FRICTION = 0.97;
 
-  // === Generate balls ===
   const generateBalls = useCallback((): Ball[] => {
     if (ballCount < colorCount * 2) {
       const msg = `Error: For ${colorCount} colors, you need at least ${
@@ -58,7 +57,6 @@ export default function App() {
     }));
   }, [ballCount, colorCount]);
 
-  // === Start / restart game ===
   const startGame = useCallback(() => {
     const balls = generateBalls();
     if (!balls.length) return;
@@ -79,14 +77,12 @@ export default function App() {
     timerRef.current = requestAnimationFrame(updateTime);
   }, [generateBalls]);
 
-  // === Format time ===
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
     const msRemainder = Math.floor(ms % 1000);
     return `${seconds}.${msRemainder.toString().padStart(3, "0")}s`;
   };
 
-  // === Cursor tracking ===
   useEffect(() => {
     const field = gameFieldRef.current;
     if (!field) return;
@@ -112,7 +108,6 @@ export default function App() {
     };
   }, [isWin]);
 
-  // === Animation ===
   useEffect(() => {
     let animationId: number;
 
@@ -123,7 +118,6 @@ export default function App() {
       for (let i = 0; i < balls.length; i++) {
         const b = balls[i];
 
-        // Cursor push
         if (cursorRef.current && !isWin) {
           const { x, y } = cursorRef.current;
           const dx = b.x + BALL_SIZE / 2 - x;
@@ -136,7 +130,6 @@ export default function App() {
           }
         }
 
-        // Ball collisions
         for (let j = i + 1; j < balls.length; j++) {
           const o = balls[j];
           const dx = b.x - o.x;
@@ -158,7 +151,6 @@ export default function App() {
           }
         }
 
-        // Update position and velocity
         b.x += b.vx;
         b.y += b.vy;
         b.vx *= FRICTION;
@@ -170,7 +162,6 @@ export default function App() {
           b.vy = (b.vy / speed) * MAX_SPEED;
         }
 
-        // Boundaries
         if (b.x < 0) { b.x = 0; b.vx *= -0.6; }
         if (b.x > FIELD_WIDTH - BALL_SIZE) { b.x = FIELD_WIDTH - BALL_SIZE; b.vx *= -0.6; }
         if (b.y < 0) { b.y = 0; b.vy *= -0.6; }
@@ -192,7 +183,6 @@ export default function App() {
     return () => cancelAnimationFrame(animationId);
   }, [isWin]);
 
-  // === Highlight balls ===
   const getHighlight = (ball: Ball) => {
     const balls = ballsRef.current;
     if (!balls.length) return false;
@@ -218,7 +208,6 @@ export default function App() {
     return visited.has(ball) && visited.size > 1;
   };
 
-  // === Check win ===
   const checkWin = (): boolean => {
     const balls = ballsRef.current;
     if (!balls.length) return false;
@@ -268,7 +257,6 @@ export default function App() {
     return true;
   };
 
-  // === Restart on ball/color change ===
   useEffect(() => {
     startGame();
   }, [ballCount, colorCount, startGame]);
@@ -280,7 +268,6 @@ export default function App() {
       </header>
 
       <main className="flex-1 p-4 flex flex-col items-center">
-        {/* Controls */}
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex flex-col">
             <label className="mb-1">Number of Balls (min 6)</label>
@@ -314,7 +301,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* Game Field */}
         <div
           ref={gameFieldRef}
           className="relative bg-gray-700 rounded overflow-hidden"
@@ -373,7 +359,6 @@ export default function App() {
           )}
         </div>
 
-        {/* Error Message */}
         {errorMessage && (
           <div className="mt-4 text-red-500 text-center font-semibold">
             {errorMessage}
